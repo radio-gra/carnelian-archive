@@ -1,10 +1,14 @@
+// todo: anync/await
+
 const express = require('express');
 const mongoose = require('mongoose');
 const album = require('./models/album');
 const artist = require('./models/artist');
+const bodyparser = require('body-parser');
 // const {Album} = require('./models/album');
 
 const app = express();
+app.use(bodyparser.json());
 
 const AlbumSchema = mongoose.Schema({
     name: String,
@@ -25,16 +29,16 @@ app.get('/mynameis', (req, res) => {
 });
 
 
+const artistRouter = require('./routes/artist.router');
+app.use('/artist', artistRouter);
 
 mongoose.connect('mongodb://localhost:27017/jasper', {useNewUrlParser: true}, () => console.log('DB OK'));
 var db = mongoose.connection;
+
+
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    var Album = album.Album;
-    Album.find(function (err, albums) {
-        if (err) return console.error(err);
-        console.log(albums);
-    });
+    console.log('connected');
 });
 
 app.listen(1337);

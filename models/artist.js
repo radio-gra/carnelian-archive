@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
-const album = require('./album');
 
-const ArtistSchema = mongoose.Schema({
-    name: String,
-    year: Number,
-    genres: [String],
-    albums: [album.AlbumSchema],
+const ArtistSchema = new mongoose.Schema({
+    name: {type: String, required: true},
+    year: {type: Number, required: true},
+    genres: {type: [String], required: true},
+    albums: [{type: mongoose.Schema.Types.ObjectId, ref: 'Album'}]
 });
 
 exports.ArtistSchema = ArtistSchema;

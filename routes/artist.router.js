@@ -63,9 +63,10 @@ router.patch('/:id', (req, res) => {
         if (req.body.genres) {
             foundArtist.genres = req.body.genres;
         }
-        if (req.body.albums) {
-            foundArtist.albums = req.body.albums;
-        }
+        // todo resolve album updates
+        // if (req.body.albums) {
+        //     foundArtist.albums = req.body.albums;
+        // }
         foundArtist.save((err, savedArtist) => {
             if (err) {
                 console.error(err);

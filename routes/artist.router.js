@@ -33,6 +33,15 @@ router.post('/', (req, res) => {
         genres: req.body.genres,
         albums: [],
     });
+    if (req.body.imageUrl) {
+        newArtist.imageUrl = req.body.imageUrl;
+    }
+    if (typeof(req.body.trending) !== "undefined") {
+        foundArtist.trending = req.body.trending;
+        if (foundArtist.trending === true) {
+            foundArtist.trendingDate = Date();
+        }
+    }
     newArtist.save((err, savedArtist) => {
         if (err) {
             console.error(err);
@@ -63,10 +72,19 @@ router.patch('/:id', (req, res) => {
         if (req.body.genres) {
             foundArtist.genres = req.body.genres;
         }
+        if (req.body.imageUrl) {
+            foundArtist.imageUrl = req.body.imageUrl;
+        }
         // todo resolve album updates
         // if (req.body.albums) {
         //     foundArtist.albums = req.body.albums;
         // }
+        if (typeof(req.body.trending) !== "undefined") {
+            foundArtist.trending = req.body.trending;
+            if (foundArtist.trending === true) {
+                foundArtist.trendingDate = Date();
+            }
+        }
         foundArtist.save((err, savedArtist) => {
             if (err) {
                 console.error(err);

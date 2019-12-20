@@ -6,15 +6,15 @@ const bodyparser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const artistRouter = require('./routes/artist.router');
-const albumRouter = require('./routes/album.router');
-app.use('/artist', artistRouter);
-app.use('/album', albumRouter);
 app.use(bodyparser.json());
 app.use(cors({
     origin: ['http://localhost:4200']
 }));
 
+const artistRouter = require('./routes/artist.router');
+const albumRouter = require('./routes/album.router');
+app.use('/artist', artistRouter);
+app.use('/album', albumRouter);
 
 app.get('/', (req, res) => {
     res.send('carnelian.');

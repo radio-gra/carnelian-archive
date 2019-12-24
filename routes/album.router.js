@@ -3,6 +3,18 @@ const router = express.Router();
 const album = require('../models/album');
 const artist = require('../models/artist');
 
+// GET all
+router.get('/', (req, res) => {
+    album.Album.find({}).exec((err, allAlbums) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        res.json(allAlbums);
+    });
+});
+
 // GET :id
 router.get('/:id', (req, res) => {
     album.Album.findById(req.params.id).exec((err, foundAlbum) => {

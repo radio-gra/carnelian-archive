@@ -2,6 +2,18 @@ const express = require('express');
 const router = express.Router();
 const artist = require('../models/artist');
 
+// GET all
+router.get('/', (req, res) => {
+    artist.Artist.find({}).exec((err, allArtists) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        res.json(allArtists);
+    });
+});
+
 // GET :id
 router.get('/:id', (req, res) => {
     artist.Artist.findById(req.params.id).exec((err, foundArtist) => {

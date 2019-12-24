@@ -46,22 +46,21 @@ router.post('/', (req, res) => {
         genres: req.body.genres,
         artist: req.body.artist,
     });
+    if (req.body.imageUrl) {
+        newAlbum.imageUrl = req.body.imageUrl;
+    }
+    if (typeof(req.body.trending) !== "undefined") {
+        newAlbum.trending = req.body.trending;
+        if (newAlbum.trending === true) {
+            newAlbum.trendingDate = Date();
+        }
+    }
     newAlbum.save((err, savedAlbum) => {
         if (err) {
             console.error(err);
             res.status(400).json({message: err.message});
         }
-        artist.Artist.update(
-            {_id: savedAlbum.artist},
-            {$addToSet: {"albums": {_id: savedAlbum._id}}}, err => {
-                if (err) {
-                    console.error(err);
-                    res.status(500).json({message: err.message});
-                    return;
-                }
-                res.status(200).json(savedAlbum);
-            }
-        );
+        res.status(200).json(savedAlbum);
     });
 });
 
@@ -89,22 +88,21 @@ router.patch('/:id', (req, res) => {
         if (req.body.artist) {
             foundAlbum.artist = req.body.artist;
         }
+        if (req.body.imageUrl) {
+            foundAlbum.imageUrl = req.body.imageUrl;
+        }
+        if (typeof(req.body.trending) !== "undefined") {
+            foundAlbum.trending = req.body.trending;
+            if (foundAlbum.trending === true) {
+                foundAlbum.trendingDate = Date();
+            }
+        }
         foundAlbum.save((err, updatedAlbum) => {
             if (err) {
                 console.error(err);
                 res.status(400).json({message: err.message});
             }
-            artist.Artist.update(
-                {_id: updatedAlbum.artist},
-                {$addToSet: {"albums": {_id: updatedAlbum._id}}}, err => {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({message: err.message});
-                        return;
-                    }
-                    res.status(200).json(updatedAlbum);
-                }
-            );
+            res.status(200).json(updatedAlbum);
         });
     });
 });
@@ -126,17 +124,7 @@ router.delete('/:id', (req, res) => {
                 console.error(err);
                 res.status(400).json({message: err.message});
             }
-            artist.Artist.update(
-                {_id: removedAlbum.artist},
-                {$pull: {"albums": removedAlbum._id}}, err => {
-                    if (err) {
-                        console.error(err);
-                        res.status(500).json({message: err.message});
-                        return;
-                    }
-                    res.status(200).json(removedAlbum);
-                }
-            );
+            res.status(200).json(removedAlbum);
         });
     });
 });

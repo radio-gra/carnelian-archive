@@ -26,14 +26,7 @@ router.get('/:id', (req, res) => {
             res.status(404).json();
             return;
         }
-        foundArtist.populate('albums', err => {
-            if (err) {
-                console.error(err);
-                res.status(500).json({message: err.message});
-                return;
-            }
-            res.json(foundArtist);
-        });
+        res.json(foundArtist);
     });
 });
 
@@ -43,15 +36,14 @@ router.post('/', (req, res) => {
         name: req.body.name,
         year: req.body.year,
         genres: req.body.genres,
-        albums: [],
     });
     if (req.body.imageUrl) {
         newArtist.imageUrl = req.body.imageUrl;
     }
     if (typeof(req.body.trending) !== "undefined") {
-        foundArtist.trending = req.body.trending;
-        if (foundArtist.trending === true) {
-            foundArtist.trendingDate = Date();
+        newArtist.trending = req.body.trending;
+        if (newArtist.trending === true) {
+            newArtist.trendingDate = Date();
         }
     }
     newArtist.save((err, savedArtist) => {
@@ -87,10 +79,6 @@ router.patch('/:id', (req, res) => {
         if (req.body.imageUrl) {
             foundArtist.imageUrl = req.body.imageUrl;
         }
-        // todo resolve album updates
-        // if (req.body.albums) {
-        //     foundArtist.albums = req.body.albums;
-        // }
         if (typeof(req.body.trending) !== "undefined") {
             foundArtist.trending = req.body.trending;
             if (foundArtist.trending === true) {

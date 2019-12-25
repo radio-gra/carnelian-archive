@@ -14,6 +14,32 @@ router.get('/', (req, res) => {
     });
 });
 
+// GET all (just name and id)
+router.get('/summary', (req, res) => {
+    artist.Artist.find({}, '_id name').exec((err, allArtists) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        res.json(allArtists);
+    });
+});
+
+// GET trending
+router.get('/trending', (req, res) => {
+    let amount = req.query.take ? parseInt(req.query.take) : 5;
+    artist.Artist.find({trending: true}).sort({trendingDate: 'desc'})
+        .limit(amount).exec((err, trendingArtists) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        res.json(trendingArtists);
+    });
+});
+
 // GET :id
 router.get('/:id', (req, res) => {
     artist.Artist.findById(req.params.id).exec((err, foundArtist) => {

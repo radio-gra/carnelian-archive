@@ -62,7 +62,7 @@ router.get('/trending', (req, res) => {
                 }
                 populatedAlbums.push(populatedAlbum);
                 if (populatedAlbums.length === albumCount) {
-                    res.json(populatedAlbums);
+                    res.json(populatedAlbums.sort(compareTrendingDates));
                 }
             });
         });
@@ -242,5 +242,16 @@ router.delete('/:id', (req, res) => {
         });
     });
 });
+
+// later date = bigger
+function compareTrendingDates(a, b) {
+    if (Date.parse(a.trendingDate) < Date.parse(b.trendingDate)) {
+        return 1;
+    }
+    if (Date.parse(a.trendingDate) === Date.parse(b.trendingDate)) {
+        return 0;
+    }
+    return -1;
+}
 
 module.exports = router;

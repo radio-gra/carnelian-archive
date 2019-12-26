@@ -11,7 +11,21 @@ router.get('/', (req, res) => {
             res.status(500).json({message: err.message});
             return;
         }
-        res.json(allAlbums);
+        const albumCount = allAlbums.length;
+        let populatedAlbums = [];
+        allAlbums.forEach(album => {
+            album.populate('artist', (err, populatedAlbum) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({message: err.message});
+                    return;
+                }
+                populatedAlbums.push(populatedAlbum);
+                if (populatedAlbums.length === albumCount) {
+                    res.json(populatedAlbums);
+                }
+            });
+        });
     });
 });
 
@@ -37,7 +51,21 @@ router.get('/trending', (req, res) => {
             res.status(500).json({message: err.message});
             return;
         }
-        res.json(trendingAlbums);
+        const albumCount = trendingAlbums.length;
+        let populatedAlbums = [];
+        trendingAlbums.forEach(album => {
+            album.populate('artist', (err, populatedAlbum) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({message: err.message});
+                    return;
+                }
+                populatedAlbums.push(populatedAlbum);
+                if (populatedAlbums.length === albumCount) {
+                    res.json(populatedAlbums);
+                }
+            });
+        });
     });
 });
 
@@ -50,7 +78,21 @@ router.get('/where', (req, res) => {
                 res.status(500).json({message: err.message});
                 return;
             }
-            res.json(foundAlbums);
+            const albumCount = foundAlbums.length;
+            let populatedAlbums = [];
+            foundAlbums.forEach(album => {
+                album.populate('artist', (err, populatedAlbum) => {
+                    if (err) {
+                        console.error(err);
+                        res.status(500).json({message: err.message});
+                        return;
+                    }
+                    populatedAlbums.push(populatedAlbum);
+                    if (populatedAlbums.length === albumCount) {
+                        res.json(populatedAlbums);
+                    }
+                });
+            });
         });
     }
     else if (req.query.artist) {
@@ -67,7 +109,21 @@ router.get('/where', (req, res) => {
                     res.status(500).json({message: err.message});
                     return;
                 }
-                res.json(foundAlbums);
+                const albumCount = foundAlbums.length;
+                let populatedAlbums = [];
+                foundAlbums.forEach(album => {
+                    album.populate('artist', (err, populatedAlbum) => {
+                        if (err) {
+                            console.error(err);
+                            res.status(500).json({message: err.message});
+                            return;
+                        }
+                        populatedAlbums.push(populatedAlbum);
+                        if (populatedAlbums.length === albumCount) {
+                            res.json(populatedAlbums);
+                        }
+                    });
+                });
             });
         });
     }

@@ -3,6 +3,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyparser = require('body-parser');
+const passport = require('passport');
 const cors = require('cors');
 
 const app = express();
@@ -10,11 +11,16 @@ app.use(bodyparser.json());
 app.use(cors({
     origin: ['http://localhost:4200']
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+require('./config/passport')(passport);
 
 const artistRouter = require('./routes/artist.router');
 const albumRouter = require('./routes/album.router');
+const userRouter = require('./routes/user.router');
 app.use('/artist', artistRouter);
 app.use('/album', albumRouter);
+app.use('/user', userRouter);
 
 app.get('/', (req, res) => {
     res.send('carnelian.');

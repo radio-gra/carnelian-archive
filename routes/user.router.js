@@ -30,7 +30,7 @@ router.post('/new', (req, res) => {
                 if (err) {
                     console.error(err);
                     if (err.code === 11000) {
-                        res.status(400).json({message: 'User already exists'});
+                        res.status(200).json({message: 'User already exists'});
                     } else {
                         res.status(500).json({message: err.message});
                     }
@@ -54,7 +54,7 @@ router.post('/auth', (req, res) => {
         }
         if (!foundUser) {
             console.error(err);
-            res.status(400).json({message: 'User not found'});
+            res.json({message: 'User not found'});
             return;
         }
 
@@ -75,7 +75,7 @@ router.post('/auth', (req, res) => {
                 });
             }
             else {
-                res.status(403).json({message: 'Invalid password'});
+                res.json({message: 'Invalid password'});
             }
         });
     });
@@ -84,9 +84,9 @@ router.post('/auth', (req, res) => {
 router.post('/checkusername', (req, res) => {
     user.User.findOne({username: req.body.username}).exec((err, user) => {
         if (!user) {
-            res.status(200).json({unique: true});
+            res.json({unique: true});
         } else {
-            res.status(200).json({unique: false});
+            res.json({unique: false});
         }
     });
 });
@@ -94,9 +94,9 @@ router.post('/checkusername', (req, res) => {
 router.post('/checkemail', (req, res) => {
     user.User.findOne({email: req.body.email}).exec((err, user) => {
         if (!user) {
-            res.status(200).json({unique: true});
+            res.json({unique: true});
         } else {
-            res.status(200).json({unique: false});
+            res.json({unique: false});
         }
     });
 });

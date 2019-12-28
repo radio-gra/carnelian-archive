@@ -129,6 +129,19 @@ router.get('/where', (req, res) => {
     }
 });
 
+// GET forartist (albums w/ artist=id)
+router.get('/forartist/:id', (req, res) => {
+    album.Album.find({artist: req.params.id}).exec((err, foundAlbums) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        //no population here since artist is already presumed to be known
+        res.json(foundAlbums);
+    });
+});
+
 // GET :id
 router.get('/:id', (req, res) => {
     album.Album.findById(req.params.id).exec((err, foundAlbum) => {

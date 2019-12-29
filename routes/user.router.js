@@ -5,6 +5,17 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const user = require('../models/user');
 
+// GET all
+router.get('/', (req, res) => {
+    user.User.find({}).exec((err, allUsers) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        res.json(allUsers);
+    });
+});
 
 router.post('/new', (req, res) => {
     let newUser = new user.User({

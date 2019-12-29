@@ -12,6 +12,10 @@ router.get('/', (req, res) => {
             return;
         }
         const albumCount = allAlbums.length;
+        if (albumCount === 0) {
+            res.json([]);
+            return;
+        }
         let populatedAlbums = [];
         allAlbums.forEach(album => {
             album.populate('artist', (err, populatedAlbum) => {

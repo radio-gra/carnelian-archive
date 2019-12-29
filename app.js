@@ -18,9 +18,11 @@ require('./config/passport')(passport);
 const artistRouter = require('./routes/artist.router');
 const albumRouter = require('./routes/album.router');
 const userRouter = require('./routes/user.router');
+const ratingRouter = require('./routes/rating.router');
 app.use('/artist', artistRouter);
 app.use('/album', albumRouter);
 app.use('/user', userRouter);
+app.use('/rating', ratingRouter);
 
 app.get('/', (req, res) => {
     res.send('carnelian.');

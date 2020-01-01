@@ -57,8 +57,8 @@ router.get('/trending', (req, res) => {
         }
         const albumCount = trendingAlbums.length;
         let populatedAlbums = [];
-        trendingAlbums.forEach(album => {
-            album.populate('artist', (err, populatedAlbum) => {
+        trendingAlbums.forEach(trendingAlbum => {
+            trendingAlbum.populate('artist', (err, populatedAlbum) => {
                 if (err) {
                     console.error(err);
                     res.status(500).json({message: err.message});
@@ -72,6 +72,37 @@ router.get('/trending', (req, res) => {
         });
     });
 });
+
+// GET chart
+router.get('/chart', (req, res) => {
+    let amount = req.query.take ? parseInt(req.query.take) : 5;
+    album.Album.aggregate([
+        {
+            $lookup: {
+                from: 'artists',
+                localField: 'artist',
+                foreignField: '_id',
+                as: 'artist'
+            }
+        },
+        {
+            $unwind: '$artist'
+        },
+        {
+            $sort: {
+                avgRating: -1
+            }
+        }
+    ]).limit(amount).exec((err, allAlbums) => {
+        if (err) {
+            console.error(err);
+            res.status(500).json({message: err.message});
+            return;
+        }
+        res.json(allAlbums);
+    });
+});
+
 
 // GET where (filter)
 router.get('/where', (req, res) => {

@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const rating = require('../models/rating');
+const album = require('../models/album');
 
 // GET /foruser/:id
 router.get('/foruser/:id', ((req, res) => {
@@ -89,6 +90,7 @@ router.delete('/:id', (req, res) => {
                 res.status(400).json({message: err.message});
             }
             res.status(200).json(removedRating);
+            updateAvgRating(removedRating.album);
         });
     });
 });
@@ -137,6 +139,7 @@ router.post('/rate', passport.authenticate('jwt', {session: false}), ((req, res)
                     return;
                 }
                 res.status(200).json(savedRating);
+                updateAvgRating(savedRating.album);
             });
         } else {
             foundRating.value = newRating.value;
@@ -148,6 +151,7 @@ router.post('/rate', passport.authenticate('jwt', {session: false}), ((req, res)
                     return;
                 }
                 res.status(200).json(savedRating);
+                updateAvgRating(savedRating.album);
             });
         }
     });
@@ -171,6 +175,7 @@ router.delete('/my/:id', passport.authenticate('jwt', {session: false}), ((req, 
                 res.status(400).json({message: err.message});
             }
             res.status(200).json(removedRating);
+            updateAvgRating(removedRating.album);
         });
     });
 }));
@@ -179,6 +184,38 @@ function validateRatingValue(rating) {
     const value = rating.value;
     if (value > 10 || value < 1) return false;
     return value.toString().indexOf('.') === -1;
+}
+
+//update album's avg rating after rating insert/upd/deletion
+function updateAvgRating(albumId) {
+    album.Album.findById(albumId).exec((err, foundAlbum) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        if (!foundAlbum) {
+            console.log(`no album found for id ${albumId}`);
+            return;
+        }
+        rating.Rating.find({album: albumId}).exec((err, foundRatings) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            if (foundRatings.length === 0) {
+                foundAlbum.avgRating = 0;
+                foundAlbum.save();
+                return;
+            }
+            let avgRating = 0;
+            foundRatings.forEach(rating => {
+                avgRating += rating.value;
+            });
+            avgRating /= foundRatings.length;
+            foundAlbum.avgRating = avgRating;
+            foundAlbum.save();
+        });
+    });
 }
 
 module.exports = router;

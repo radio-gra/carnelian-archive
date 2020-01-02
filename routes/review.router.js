@@ -31,7 +31,42 @@ router.get('/foralbum/:id', ((req, res) => {
                 }
                 populatedReviews.push(populatedReview);
                 if (populatedReviews.length === reviewCount) {
-                    res.json(populatedReviews);
+                    res.json(populatedReviews.sort(compareDates));
+                }
+            });
+        });
+    });
+}));
+
+// GET /other/:id (for auth user) (reviews for album except own)
+router.get('/other/:id', passport.authenticate('jwt', {session: false}), ((req, res) => {
+    review.Review.find({album: req.params.id}).exec((err, foundReviews) => {
+        if (err) {
+            console.error(err);
+            res.status(400).json({message: err.message});
+            return;
+        }
+        if (req.query.short && req.query.short === 'true') {
+            res.json(foundReviews);
+            return;
+        }
+        foundReviews = foundReviews.filter(review => review.user.toString() !== req.user._id.toString());
+        const reviewCount = foundReviews.length;
+        if (reviewCount === 0) {
+            res.json([]);
+            return;
+        }
+        let populatedReviews = [];
+        foundReviews.forEach(review => {
+            review.populate('user', (err, populatedReview) => {
+                if (err) {
+                    console.error(err);
+                    res.status(500).json({message: err.message});
+                    return;
+                }
+                populatedReviews.push(populatedReview);
+                if (populatedReviews.length === reviewCount) {
+                    res.json(populatedReviews.sort(compareDates));
                 }
             });
         });
@@ -97,7 +132,7 @@ router.get('/trending', (req, res) => {
                 }
                 populatedReviews.push(populatedReview);
                 if (populatedReviews.length === reviewCount) {
-                    res.json(populatedReviews.sort(compareTrendingDates));
+                    res.json(populatedReviews.sort(compareDates));
                 }
             });
         });
@@ -218,7 +253,7 @@ router.delete('/my/:id', passport.authenticate('jwt', {session: false}), ((req, 
 }));
 
 // later date = bigger
-function compareTrendingDates(a, b) {
+function compareDates(a, b) {
     if (Date.parse(a.trendingDate) < Date.parse(b.trendingDate)) {
         return 1;
     }

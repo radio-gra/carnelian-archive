@@ -31,7 +31,7 @@ router.get('/foralbum/:id', ((req, res) => {
                 }
                 populatedReviews.push(populatedReview);
                 if (populatedReviews.length === reviewCount) {
-                    res.json(populatedReviews.sort(compareDates));
+                    res.json(populatedReviews.sort(compareReviewDates));
                 }
             });
         });
@@ -66,7 +66,7 @@ router.get('/other/:id', passport.authenticate('jwt', {session: false}), ((req, 
                 }
                 populatedReviews.push(populatedReview);
                 if (populatedReviews.length === reviewCount) {
-                    res.json(populatedReviews.sort(compareDates));
+                    res.json(populatedReviews.sort(compareReviewDates));
                 }
             });
         });
@@ -114,6 +114,7 @@ router.get('/my/:id', passport.authenticate('jwt', {session: false}), ((req, res
 // GET trending
 router.get('/trending', (req, res) => {
     let amount = req.query.take ? parseInt(req.query.take) : 5;
+    let trunc = req.query.trunc ? parseInt(req.query.trunc) : 100000;
     review.Review.find({trending: true}).sort({trendingDate: 'desc'})
         .limit(amount).exec((err, trendingReviews) => {
         if (err) {
@@ -132,7 +133,10 @@ router.get('/trending', (req, res) => {
                 }
                 populatedReviews.push(populatedReview);
                 if (populatedReviews.length === reviewCount) {
-                    res.json(populatedReviews.sort(compareDates));
+                    res.json(populatedReviews.map(r => {
+                        r.body = r.body.substr(0, trunc) + '...';
+                        return r;
+                    }).sort(compareTrendingDates));
                 }
             });
         });
@@ -188,8 +192,8 @@ router.post('/review', passport.authenticate('jwt', {session: false}), ((req, re
 }));
 
 // PATCH /:id 
-router.post('/review', passport.authenticate('jwt', {session: false}), ((req, res) => {
-    review.Review.findOne({user: newReview.user, album: newReview.album}).exec((err, foundReview) => {
+router.patch('/:id', ((req, res) => {
+    review.Review.findById(req.params.id).exec((err, foundReview) => {
         if (err) {
             console.error(err);
             res.status(400).json({message: err.message});
@@ -253,11 +257,21 @@ router.delete('/my/:id', passport.authenticate('jwt', {session: false}), ((req, 
 }));
 
 // later date = bigger
-function compareDates(a, b) {
+function compareTrendingDates(a, b) {
     if (Date.parse(a.trendingDate) < Date.parse(b.trendingDate)) {
         return 1;
     }
     if (Date.parse(a.trendingDate) === Date.parse(b.trendingDate)) {
+        return 0;
+    }
+    return -1;
+}
+
+function compareReviewDates(a, b) {
+    if (Date.parse(a.reviewDate) < Date.parse(b.reviewDate)) {
+        return 1;
+    }
+    if (Date.parse(a.reviewDate) === Date.parse(b.reviewDate)) {
         return 0;
     }
     return -1;

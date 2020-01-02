@@ -66,7 +66,7 @@ router.get('/trending', (req, res) => {
                 }
                 populatedAlbums.push(populatedAlbum);
                 if (populatedAlbums.length === albumCount) {
-                    res.json(populatedAlbums.sort(compareDates));
+                    res.json(populatedAlbums.sort(compareTrendingDates));
                 }
             });
         });
@@ -292,7 +292,7 @@ router.delete('/:id', (req, res) => {
 });
 
 // later date = bigger
-function compareDates(a, b) {
+function compareTrendingDates(a, b) {
     if (Date.parse(a.trendingDate) < Date.parse(b.trendingDate)) {
         return 1;
     }

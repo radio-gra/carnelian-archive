@@ -114,6 +114,10 @@ router.get('/where', (req, res) => {
                 return;
             }
             const albumCount = foundAlbums.length;
+            if (albumCount === 0) {
+                res.json([]);
+                return;
+            }
             let populatedAlbums = [];
             foundAlbums.forEach(album => {
                 album.populate('artist', (err, populatedAlbum) => {
@@ -145,6 +149,10 @@ router.get('/where', (req, res) => {
                     return;
                 }
                 const albumCount = foundAlbums.length;
+                if (albumCount === 0) {
+                    res.json([]);
+                    return;
+                }
                 let populatedAlbums = [];
                 foundAlbums.forEach(album => {
                     album.populate('artist', (err, populatedAlbum) => {
@@ -162,11 +170,14 @@ router.get('/where', (req, res) => {
             });
         });
     }
+    else {
+        res.json([]);
+    }
 });
 
 // GET forartist (albums w/ artist=id)
 router.get('/forartist/:id', (req, res) => {
-    album.Album.find({artist: req.params.id}).exec((err, foundAlbums) => {
+    album.Album.find({artist: req.params.id}).sort({year: 'asc'}).exec((err, foundAlbums) => {
         if (err) {
             console.error(err);
             res.status(500).json({message: err.message});
